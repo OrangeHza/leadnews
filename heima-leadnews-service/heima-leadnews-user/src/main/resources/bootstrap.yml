@@ -2,11 +2,13 @@ server:
   port: 51801
 spring:
   application:
-    name: leadnews-user
+    name: leadnews-user # 还有些配置可以放在nacos端，方便热更新  名称就是微服务名(leadnews-user)即可
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.200.130:8848
+        server-addr: 192.168.141.102:8848 # 注册发现地址 和配置地址一样 都是nacos
       config:
-        server-addr: 192.168.200.130:8848
-        file-extension: yml
+        server-addr: 192.168.141.102:8848 # 配置地址 和注册发现地址一样 都是nacos
+        file-extension: yml # nacos中心有一个 leadnews-user.yml配置文件，也是我这个微服务的配置文件
+        # 这也是为啥这个配置文件名称不叫application.yml 而叫 bootstrap.yml的原因
+        # 先加载这里的配置，再加载远端配置，远端配置可以覆盖这里的配置

@@ -2,15 +2,16 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="heima-leadnews-test" />
         <module name="heima-leadnews-utils" />
-        <module name="heima-leadnews-feign-api" />
         <module name="heima-leadnews-user" />
         <module name="heima-leadnews-app-gateway" />
+        <module name="heima-leadnews-feign-api" />
         <module name="heima-leadnews-common" />
         <module name="heima-leadnews-model" />
       </profile>

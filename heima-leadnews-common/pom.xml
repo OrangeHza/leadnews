@@ -10,7 +10,7 @@
     <artifactId>heima-leadnews-common</artifactId>
     <packaging>jar</packaging>
 
-    <name>heima-leadnews-common</name>
+    <name>whu-leadnews-common</name>
 
     <dependencies>
         <dependency>

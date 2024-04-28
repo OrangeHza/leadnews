@@ -6,10 +6,12 @@ import cn.whu.model.user.dtos.LoginDto;
 import cn.whu.model.user.pojos.ApUser;
 
 public interface ApUserService extends IService<ApUser> {
+
     /**
-     * app端登录功能
+     * app端登陆功能
      * @param dto
      * @return
      */
     public ResponseResult login(LoginDto dto);
+
 }

@@ -17,14 +17,14 @@ public class AppJwtUtil {
 
     // 生产ID
     public static String getToken(Long id){
-        Map<String, Object> claimMaps = new HashMap<>();
+        Map<String, Object> claimMaps = new HashMap<>();//这个是最核心的被加密的数据
         claimMaps.put("id",id);
         long currentTime = System.currentTimeMillis();
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date(currentTime))  //签发时间
                 .setSubject("system")  //说明
-                .setIssuer("heima") //签发者信息
+                .setIssuer("whu") //签发者信息
                 .setAudience("app")  //接收用户
                 .compressWith(CompressionCodecs.GZIP)  //数据压缩方式
                 .signWith(SignatureAlgorithm.HS512, generalKey()) //加密方式
@@ -60,7 +60,7 @@ public class AppJwtUtil {
     }
 
     /**
-     * 获取hearder body信息
+     * 获取header body信息
      *
      * @param token
      * @return

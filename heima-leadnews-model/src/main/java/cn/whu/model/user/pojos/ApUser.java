@@ -11,7 +11,7 @@ import java.util.Date;
 
 
 @Data
-@TableName("ap_user")
+@TableName("ap_user") // 表名映射
 public class ApUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,15 +54,15 @@ public class ApUser implements Serializable {
 
     /**
      * 0 男
-            1 女
-            2 未知
+       1 女
+       2 未知
      */
     @TableField("sex")
     private Boolean sex;
 
     /**
      * 0 未
-            1 是
+       1 是
      */
     @TableField("is_certification")
     private Boolean certification;
@@ -75,15 +75,15 @@ public class ApUser implements Serializable {
 
     /**
      * 0正常
-            1锁定
+       1锁定
      */
     @TableField("status")
     private Boolean status;
 
     /**
      * 0 普通用户
-            1 自媒体人
-            2 大V
+       1 自媒体人
+       2 大V
      */
     @TableField("flag")
     private Short flag;

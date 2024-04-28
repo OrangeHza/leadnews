@@ -30,6 +30,7 @@ public enum AppHttpCodeEnum {
     int code;
     String errorMessage;
 
+    // 这里也是这么搞的，并不是用枚举自带的需要，果然是有道理的
     AppHttpCodeEnum(int code, String errorMessage){
         this.code = code;
         this.errorMessage = errorMessage;

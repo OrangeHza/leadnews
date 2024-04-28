@@ -5,7 +5,9 @@ import cn.whu.model.common.enums.AppHttpCodeEnum;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用的结果返回类
@@ -139,11 +141,11 @@ public class ResponseResult<T> implements Serializable {
         System.out.println(success.getErrorMessage());*/
 
         //查询一个对象
-        /*Map map = new HashMap();
+        Map map = new HashMap();
         map.put("name","zhangsan");
         map.put("age",18);
         ResponseResult result = ResponseResult.okResult(map);
-        System.out.println(JSON.toJSONString(result));*/
+        System.out.println(JSON.toJSONString(result));
 
 
         //新增，修改，删除  在项目中统一返回成功即可
@@ -156,12 +158,12 @@ public class ResponseResult<T> implements Serializable {
         System.out.println(JSON.toJSONString(result));*/
 
         //查询分页信息
-        PageResponseResult responseResult = new PageResponseResult(1,5,50);
-        List list = new ArrayList();
-        list.add("itcast");
-        list.add("itheima");
-        responseResult.setData(list);
-        System.out.println(JSON.toJSONString(responseResult));
+        //PageResponseResult responseResult = new PageResponseResult(1,5,50);
+        //List list = new ArrayList();
+        //list.add("itcast");
+        //list.add("itheima");
+        //responseResult.setData(list);
+        //System.out.println(JSON.toJSONString(responseResult));
 
     }
 
