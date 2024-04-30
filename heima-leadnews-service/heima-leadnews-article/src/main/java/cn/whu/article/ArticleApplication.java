@@ -1,4 +1,4 @@
-package com.heima.article;
+package cn.whu.article;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@MapperScan("com.heima.article.mapper")
+@MapperScan("cn.whu.article.mapper")
 public class ArticleApplication {
 
     public static void main(String[] args) {
