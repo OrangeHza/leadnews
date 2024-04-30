@@ -19,6 +19,10 @@ public class ArticleApplication {
         SpringApplication.run(ArticleApplication.class,args);
     }
 
+    /**
+     * MP分页插件
+     * @return
+     */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
