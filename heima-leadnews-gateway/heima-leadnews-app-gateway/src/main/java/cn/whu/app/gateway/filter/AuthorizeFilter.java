@@ -31,12 +31,14 @@ public class AuthorizeFilter implements Ordered, GlobalFilter {
         }
 
 
-        //3.获取token
+        //3.获取token // 前端传过来的就是"token"
         String token = request.getHeaders().getFirst("token");
 
         //4.判断token是否存在
         if(StringUtils.isBlank(token)){
+            // 返回给前端401
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            // 结束本次请求
             return response.setComplete();
         }
 
@@ -45,17 +47,18 @@ public class AuthorizeFilter implements Ordered, GlobalFilter {
             Claims claimsBody = AppJwtUtil.getClaimsBody(token);
             //是否是过期
             int result = AppJwtUtil.verifyToken(claimsBody);
-            if(result == 1 || result  == 2){
+            if(result == 1 || result  == 2){ // token 过期 同样返回401
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return response.setComplete();
             }
         }catch (Exception e){
             e.printStackTrace();
+            // token解析失败，也是返回401
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.setComplete();
         }
 
-        //6.放行
+        //6.放行 // token解析成功且有效
         return chain.filter(exchange);
     }
 

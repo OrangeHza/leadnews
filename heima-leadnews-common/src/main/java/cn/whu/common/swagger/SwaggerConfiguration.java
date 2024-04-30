@@ -21,7 +21,7 @@ public class SwaggerConfiguration {
               .apiInfo(buildApiInfo())
               .select()
               // 要扫描的API(Controller)基础包
-              .apis(RequestHandlerSelectors.basePackage("com.heima"))
+              .apis(RequestHandlerSelectors.basePackage("cn.whu"))
               .paths(PathSelectors.any())
               .build();
    }

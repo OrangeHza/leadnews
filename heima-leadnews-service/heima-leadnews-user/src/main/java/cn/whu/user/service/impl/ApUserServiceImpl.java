@@ -1,19 +1,16 @@
 package cn.whu.user.service.impl;
 
-import cn.whu.user.service.ApUserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.whu.model.common.dtos.ResponseResult;
 import cn.whu.model.common.enums.AppHttpCodeEnum;
 import cn.whu.model.user.dtos.LoginDto;
 import cn.whu.model.user.pojos.ApUser;
 import cn.whu.user.mapper.ApUserMapper;
+import cn.whu.user.service.ApUserService;
 import cn.whu.utils.common.AppJwtUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.common.protocol.types.Field;
-import org.jcodings.util.Hash;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -25,7 +22,6 @@ import java.util.Map;
 @Transactional // 事务
 @Slf4j
 public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> implements ApUserService {
-
 
     /**
      * app端登陆功能
@@ -68,7 +64,5 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
             map.put("token",AppJwtUtil.getToken(0L));
             return ResponseResult.okResult(map);
         }
-
-
     }
 }
