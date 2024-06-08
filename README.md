@@ -8,4 +8,10 @@ C503 新建第一个其他分支，做最初的开发
 远程仓库地址：https://github.com/OrangeHza/leadnews.git
 
 
+查看端口占用：
+netstat -ano | findstr 端口号
+结束进程
+taskkill /F /PID 进程PID
+
+
 
