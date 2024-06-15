@@ -1,3 +1,5 @@
+package cn.whu.wemedia.hza;
+
 import java.util.ArrayList;
 
 public class HzaTest {

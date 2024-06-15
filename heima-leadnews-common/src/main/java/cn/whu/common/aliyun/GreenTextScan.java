@@ -1,109 +1,83 @@
 package cn.whu.common.aliyun;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
-import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.exceptions.ServerException;
-import com.aliyuncs.green.model.v20180509.TextScanRequest;
-import com.aliyuncs.http.FormatType;
-import com.aliyuncs.http.HttpResponse;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.profile.IClientProfile;
+import com.aliyun.imageaudit20191230.*;
+import com.aliyun.imageaudit20191230.models.ScanTextRequest;
+import com.aliyun.imageaudit20191230.models.ScanTextResponse;
+import com.aliyun.imageaudit20191230.models.ScanTextResponseBody;
+import com.aliyun.tea.TeaException;
+import com.aliyun.teaopenapi.models.Config;
+import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "aliyun")
+@ConfigurationProperties(prefix = "aliyun") // 读取xml配置李 aliyun打头的配置  为两个属性自动赋值
+                                            // 动态的参数都在xml里了，工具类直接拿来用，多好哇
+                                            // wemedia要用，就在wemedia的nacos动态xml中配置
 public class GreenTextScan {
+
 
     private String accessKeyId;
     private String secret;
 
-    public Map greeTextScan(String content) throws Exception {
-        System.out.println(accessKeyId);
-        IClientProfile profile = DefaultProfile
-                .getProfile("cn-shanghai", accessKeyId, secret);
-        DefaultProfile.addEndpoint("cn-shanghai", "cn-shanghai", "Green", "green.cn-shanghai.aliyuncs.com");
-        IAcsClient client = new DefaultAcsClient(profile);
-        TextScanRequest textScanRequest = new TextScanRequest();
-        textScanRequest.setAcceptFormat(FormatType.JSON); // 指定api返回格式
-        textScanRequest.setHttpContentType(FormatType.JSON);
-        textScanRequest.setMethod(com.aliyuncs.http.MethodType.POST); // 指定请求方法
-        textScanRequest.setEncoding("UTF-8");
-        textScanRequest.setRegionId("cn-shanghai");
-        List<Map<String, Object>> tasks = new ArrayList<Map<String, Object>>();
-        Map<String, Object> task1 = new LinkedHashMap<String, Object>();
-        task1.put("dataId", UUID.randomUUID().toString());
-        /**
-         * 待检测的文本，长度不超过10000个字符
+    public Map greenTextScan(String content) throws Exception {
+        /*
+          初始化配置对象com.aliyun.teaopenapi.models.Config
+          Config对象存放 AccessKeyId、AccessKeySecret、endpoint等配置
          */
-        task1.put("content", content);
-        tasks.add(task1);
-        JSONObject data = new JSONObject();
-
-        /**
-         * 检测场景，文本垃圾检测传递：antispam
-         **/
-        data.put("scenes", Arrays.asList("antispam"));
-        data.put("tasks", tasks);
-        System.out.println(JSON.toJSONString(data, true));
-        textScanRequest.setHttpContent(data.toJSONString().getBytes("UTF-8"), "UTF-8", FormatType.JSON);
-        // 请务必设置超时时间
-        textScanRequest.setConnectTimeout(3000);
-        textScanRequest.setReadTimeout(6000);
-
+        Config config = new Config()
+                .setAccessKeyId(accessKeyId)
+                .setAccessKeySecret(secret);
+        // 访问的域名
+        config.endpoint = "imageaudit.cn-shanghai.aliyuncs.com";
+        Client client = new Client(config);
+        ScanTextRequest.ScanTextRequestTasks tasks = new ScanTextRequest.ScanTextRequestTasks()
+                .setContent(content);  //审核内容
+        ScanTextRequest.ScanTextRequestLabels labels = new ScanTextRequest.ScanTextRequestLabels()
+                .setLabel("abuse");  //设置审核类型
+        ScanTextRequest scanTextRequest = new ScanTextRequest()
+                .setLabels(java.util.Arrays.asList(
+                        labels
+                ))
+                .setTasks(java.util.Arrays.asList(
+                        tasks
+                ));
+        RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
         Map<String, String> resultMap = new HashMap<>();
         try {
-            HttpResponse httpResponse = client.doAction(textScanRequest);
-            if (httpResponse.isSuccess()) {
-                JSONObject scrResponse = JSON.parseObject(new String(httpResponse.getHttpContent(), "UTF-8"));
-                System.out.println(JSON.toJSONString(scrResponse, true));
-                if (200 == scrResponse.getInteger("code")) {
-                    JSONArray taskResults = scrResponse.getJSONArray("data");
-                    for (Object taskResult : taskResults) {
-                        if (200 == ((JSONObject) taskResult).getInteger("code")) {
-                            JSONArray sceneResults = ((JSONObject) taskResult).getJSONArray("results");
-                            for (Object sceneResult : sceneResults) {
-                                String scene = ((JSONObject) sceneResult).getString("scene");
-                                String label = ((JSONObject) sceneResult).getString("label");
-                                String suggestion = ((JSONObject) sceneResult).getString("suggestion");
-                                System.out.println("suggestion = [" + label + "]");
-                                if (!suggestion.equals("pass")) {
-                                    resultMap.put("suggestion", suggestion);
-                                    resultMap.put("label", label);
-                                    return resultMap;
-                                }
+            // 复制代码运行请自行打印API的返回值
+            ScanTextResponse response = client.scanTextWithOptions(scanTextRequest, runtime);
 
-                            }
-                        } else {
-                            return null;
-                        }
-                    }
-                    resultMap.put("suggestion", "pass");
+            //System.out.println(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(response)));
+            if (response.getStatusCode() == 200) {
+
+                ScanTextResponseBody.ScanTextResponseBodyDataElementsResults elementsResults = response.body.getData().elements.get(0).results.get(0);
+                if (!elementsResults.suggestion.equals("pass")) {
+                    resultMap.put("suggestion", elementsResults.suggestion);
+                    resultMap.put("label", elementsResults.label);
                     return resultMap;
-                } else {
-                    return null;
                 }
+                resultMap.put("suggestion", "pass");
+                return resultMap;
             } else {
                 return null;
             }
-        } catch (ServerException e) {
-            e.printStackTrace();
-        } catch (ClientException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+
+        } catch (TeaException error) {
+            // 获取整体报错信息
+            System.out.println(com.aliyun.teautil.Common.toJSONString(error));
+            // 获取单个字段
+            System.out.println(error.getCode());
+            error.printStackTrace();
         }
         return null;
     }
-
 }

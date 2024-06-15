@@ -1,5 +1,6 @@
 package cn.whu.article.service;
 
+import cn.whu.model.article.dtos.ArticleDto;
 import cn.whu.model.article.dtos.ArticleHomeDto;
 import cn.whu.model.article.pojos.ApArticle;
 import cn.whu.model.common.dtos.ResponseResult;
@@ -16,5 +17,12 @@ public interface ApArticleService extends IService<ApArticle> {
      * @return
      */
     ResponseResult load(ArticleHomeDto dto, Short loadType);
+
+    /**
+     * 保存文章(审核通过后的文章)
+     * @param dto
+     * @return
+     */
+    ResponseResult saveArticle(ArticleDto dto);
 
 }

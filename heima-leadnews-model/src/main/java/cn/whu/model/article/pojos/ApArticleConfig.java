@@ -17,8 +17,19 @@ import java.io.Serializable;
  */
 
 @Data
+//@NoArgsConstructor
 @TableName("ap_article_config")
 public class ApArticleConfig implements Serializable {
+
+    public ApArticleConfig(){} // 空参配置最好有，不然可能无法序列化
+
+    public ApArticleConfig(Long articleId){
+        this.articleId = articleId; // 这篇文章的配置
+        this.isComment = true; // 默认可评论
+        this.isForward = true; // 默认可转发
+        this.isDelete = false; // 默认未删除
+        this.isDown = false; // 默认未下架
+    }
 
     @TableId(value = "id",type = IdType.ID_WORKER)
     private Long id;

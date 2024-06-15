@@ -13,8 +13,6 @@ import java.util.Date;
  * <p>
  * 文章信息表，存储已发布的文章
  * </p>
- *
- * @author itheima
  */
 
 @Data
