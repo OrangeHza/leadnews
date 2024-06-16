@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class ArticleDto  extends ApArticle {
+
     /**
      * 文章内容
      */

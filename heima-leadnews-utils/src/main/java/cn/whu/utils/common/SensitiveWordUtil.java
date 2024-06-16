@@ -112,10 +112,12 @@ public class SensitiveWordUtil {
 
     public static void main(String[] args) {
         List<String> list = new ArrayList<>();
+        // 自定义铭感词
         list.add("法轮");
         list.add("法轮功");
         list.add("冰毒");
         initMap(list);
+        // 就可以检测文本中是否有敏感词了
         String content="我是一个好人，并不会卖冰毒，也不操练法轮功,我真的不卖冰毒";
         Map<String, Integer> map = matchWords(content);
         System.out.println(map);

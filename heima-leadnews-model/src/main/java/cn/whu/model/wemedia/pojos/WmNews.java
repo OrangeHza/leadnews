@@ -21,6 +21,7 @@ import java.util.Date;
 @TableName("wm_news")
 public class WmNews implements Serializable {
 
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -82,7 +83,7 @@ public class WmNews implements Serializable {
             0 草稿
             1 提交（待审核）
             2 审核失败
-            3 人工审核
+            3 待人工审核
             4 人工审核通过
             8 审核通过（待发布）
             9 已发布

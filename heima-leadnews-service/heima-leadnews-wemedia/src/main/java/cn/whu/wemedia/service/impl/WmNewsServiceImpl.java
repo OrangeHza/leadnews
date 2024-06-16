@@ -14,6 +14,7 @@ import cn.whu.utils.thread.WmThreadLocalUtil;
 import cn.whu.wemedia.mapper.WmMaterialMapper;
 import cn.whu.wemedia.mapper.WmNewsMapper;
 import cn.whu.wemedia.mapper.WmNewsMaterialMapper;
+import cn.whu.wemedia.service.WmNewsAutoScanService;
 import cn.whu.wemedia.service.WmNewsService;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -43,6 +44,10 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     @Resource
     private WmMaterialMapper wmMaterialMapper;
+
+    // 文章发布成功后 需要调自动审核文章
+    @Resource
+    private WmNewsAutoScanService wmNewsAutoScanService;
 
     /**
      * 根据条件，批量查询文章列表
@@ -138,6 +143,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         //4.不是草稿：保存文章封面图片与素材的关系 (文章封面可以有单独的一张或几张图片，需要单独关联一下)
         // 如果当前布局是自动，需要自动匹配封面图片(materials里拿 所以要传materials)
         saveRelativeInfoForCover(dto, wmNews, materials);//Cover封面的意思
+
+        // 5. 【新增】 审核文章.  发布成功，调用方法自动审核文章 （配置的方法，做到异步调用执行）
+        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
