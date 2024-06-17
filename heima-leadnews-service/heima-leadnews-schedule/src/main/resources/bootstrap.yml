@@ -1,0 +1,13 @@
+server:
+  port: 51701
+spring:
+  application:
+    name: leadnews-schedule
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.141.102:8848
+      # nacos热配置中心
+      config:
+        server-addr: 192.168.141.102:8848
+        file-extension: yml
