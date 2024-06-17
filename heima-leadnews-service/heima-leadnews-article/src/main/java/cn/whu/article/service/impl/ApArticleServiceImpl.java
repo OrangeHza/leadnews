@@ -4,6 +4,7 @@ import cn.whu.article.mapper.ApArticleConfigMapper;
 import cn.whu.article.mapper.ApArticleContentMapper;
 import cn.whu.article.mapper.ApArticleMapper;
 import cn.whu.article.service.ApArticleService;
+import cn.whu.article.service.ArticleFreemarkerService;
 import cn.whu.model.article.dtos.ArticleDto;
 import cn.whu.model.article.dtos.ArticleHomeDto;
 import cn.whu.model.article.pojos.ApArticle;
@@ -46,6 +47,10 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     // 常量
     private final static short MAX_PAGE_SIZE = 50; // 应该是kconf动态热配置
+
+    // 生成静态文件，并上传到minIO，做了一个单独的微服务
+    @Resource
+    private ArticleFreemarkerService articleFreemarkerService;
 
     /**
      * 根据参数加载文章列表
@@ -152,6 +157,10 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                     .set(ApArticleContent::getContent, dto.getContent())
             );
         }
+
+        // 异步调用，生成静态文件上传到minIO
+        articleFreemarkerService.buildArticleToMinIo(apArticle,dto.getContent());
+
 
         // 3. 结果返回  文章的id (凭此能找到所有文章相关信息)
         return ResponseResult.okResult(apArticle.getId());
