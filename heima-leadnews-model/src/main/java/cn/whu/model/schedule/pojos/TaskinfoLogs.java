@@ -50,7 +50,7 @@ public class TaskinfoLogs implements Serializable {
     private Integer version;
 
     /**
-     * 状态 0=int 1=EXECUTED 2=CANCELLED
+     * 状态 0=init 1=EXECUTED 2=CANCELLED
      */
     @TableField("status")
     private Integer status;

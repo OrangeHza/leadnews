@@ -16,6 +16,7 @@ import cn.whu.wemedia.mapper.WmNewsMapper;
 import cn.whu.wemedia.mapper.WmNewsMaterialMapper;
 import cn.whu.wemedia.service.WmNewsAutoScanService;
 import cn.whu.wemedia.service.WmNewsService;
+import cn.whu.wemedia.service.WmNewsTaskService;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -48,6 +49,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
     // 文章发布成功后 需要调自动审核文章
     @Resource
     private WmNewsAutoScanService wmNewsAutoScanService;
+
+    @Resource
+    private WmNewsTaskService wmNewsTaskService;
 
     /**
      * 根据条件，批量查询文章列表
@@ -145,7 +149,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         saveRelativeInfoForCover(dto, wmNews, materials);//Cover封面的意思
 
         // 5. 【新增】 审核文章.  发布成功，调用方法自动审核文章 （配置的方法，做到异步调用执行）
-        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+        //wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+        // 放到db里面，然后再由定时任务根据执行时间慢慢刷新到redis里
+        wmNewsTaskService.addNewsToTask(wmNews.getId(),wmNews.getPublishTime());
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
@@ -258,7 +264,7 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         // 0. 补全属性
         wmNews.setUserId(WmThreadLocalUtil.getUser().getId());
         wmNews.setCreatedTime(new Date());
-        wmNews.setPublishTime(new Date());
+        wmNews.setSubmitedTime(new Date()); // !!!!千万注意不是publishTime
         wmNews.setEnable((short) 1);//1默认值，代表上架
         if (wmNews.getId() == null) {
             // 1. 保存

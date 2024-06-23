@@ -76,7 +76,7 @@ public class WmNewsAutoScanServiceImpl implements WmNewsAutoScanService {
     /**
      * 自媒体文章审核
      *
-     * @param id 自媒体文章id
+     * @param id 自媒体文章id  wmNews.getId()
      */
     @Override
     @Async // 标明当前方法是一个异步方法

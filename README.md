@@ -11,6 +11,7 @@ C503 新建第一个其他分支，做最初的开发
 查看端口占用：
 
 netstat -ano | findstr 端口号
+netstat -ano | findstr :51701
 
 结束进程
 

@@ -10,6 +10,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @MapperScan("cn.whu.wemedia.mapper")
 @EnableFeignClients(basePackages = "cn.whu.apis") // 开启feign远程调用 需要扫描对应的包
 @EnableAsync // 开启异步调用  服务内容所有调用被@Async修饰的方法，都会自动变成异步调用
+@EnableScheduling // 开启任务调度，使得@Scheduled注解生效
 public class WemediaApplication {
 
     public static void main(String[] args) {
