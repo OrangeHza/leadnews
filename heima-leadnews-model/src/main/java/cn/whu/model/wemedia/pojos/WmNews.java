@@ -115,6 +115,10 @@ public class WmNews implements Serializable {
     @TableField("images")
     private String images;
 
+    /**
+     * 1 上架 (创建文章时的默认值)
+     * 0 下架
+     */
     @TableField("enable")
     private Short enable;
     

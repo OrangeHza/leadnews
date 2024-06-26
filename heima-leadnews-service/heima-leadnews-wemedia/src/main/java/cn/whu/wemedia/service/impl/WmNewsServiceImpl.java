@@ -1,6 +1,7 @@
 package cn.whu.wemedia.service.impl;
 
 import cn.whu.common.constants.WemediaConstants;
+import cn.whu.common.constants.WmNewsMessageConstants;
 import cn.whu.common.exception.CustomException;
 import cn.whu.model.common.dtos.PageResponseResult;
 import cn.whu.model.common.dtos.ResponseResult;
@@ -17,6 +18,7 @@ import cn.whu.wemedia.mapper.WmNewsMaterialMapper;
 import cn.whu.wemedia.service.WmNewsAutoScanService;
 import cn.whu.wemedia.service.WmNewsService;
 import cn.whu.wemedia.service.WmNewsTaskService;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -26,11 +28,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +56,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     @Resource
     private WmNewsTaskService wmNewsTaskService;
+
+    @Resource
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     /**
      * 根据条件，批量查询文章列表
@@ -151,7 +158,7 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         // 5. 【新增】 审核文章.  发布成功，调用方法自动审核文章 （配置的方法，做到异步调用执行）
         //wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
         // 放到db里面，然后再由定时任务根据执行时间慢慢刷新到redis里
-        wmNewsTaskService.addNewsToTask(wmNews.getId(),wmNews.getPublishTime());
+        wmNewsTaskService.addNewsToTask(wmNews.getId(), wmNews.getPublishTime());
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
@@ -276,5 +283,51 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
                     .eq(WmNewsMaterial::getNewsId, wmNews.getId()));
             updateById(wmNews); // 修改则需要根据id来更新db
         }
+    }
+
+    /**
+     * 文章的上下架
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ResponseResult downOrUp(WmNewsDto dto) {
+        // 1. 检查参数
+        if (dto == null || dto.getId() == null || dto.getEnable() == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 2. 查询文章
+        WmNews wmNews = getById(dto.getId());
+        if (wmNews == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "文章不存在");
+        }
+
+        // 3. 判断文章是否已发布
+        if (!wmNews.getStatus().equals(WmNews.Status.PUBLISHED.getCode())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "当前文章不是已发布状态，不能上下架");
+        }
+
+        // 4. 修改文章enable
+        // 也要判断，健壮性哥们儿
+        if (dto.getEnable() != null && dto.getEnable() > -1 && dto.getEnable() < 2) {
+            update(Wrappers.<WmNews>lambdaUpdate()
+                    .eq(WmNews::getId, dto.getId())
+                    .set(WmNews::getEnable, dto.getEnable())
+            );
+
+            // 发送消息，通知article修改文章的配置
+            if (wmNews.getArticleId() != null) {// 安全性无处不在
+                HashMap<String, Object> map = new HashMap<>();//好像这种都是String--Object 可以传很多类型，到时候自己去强转就行了
+                map.put("articleId", wmNews.getArticleId());
+                map.put("enable", dto.getEnable()); // 这里拿dto的，wmNews的不会回显
+                kafkaTemplate.send(WmNewsMessageConstants.WM_NEWS_UP_OR_DOWN_TOPIC, JSON.toJSONString(map));
+            }
+        }
+
+        // 先不考虑kafka消息发送
+
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }
